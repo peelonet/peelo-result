@@ -1,7 +1,11 @@
 # peelo-result
 
+[![travis][travis-image]][travis-url]
+
 Header only C++11 implementation of [Rust's Result type].
 
+[travis-image]: https://travis-ci.com/peelonet/peelo-result.svg?branch=master
+[travis-url]: https://travis-ci.com/peelonet/peelo-result
 [Rust's Result type]: https://doc.rust-lang.org/std/result/
 
 ## Usage
