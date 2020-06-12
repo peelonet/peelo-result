@@ -63,6 +63,30 @@ static void test_copy_error()
   assert(!copy.value());
 }
 
+static void test_copy_ok_with_different_types()
+{
+  using result1 = peelo::result<int, error>;
+  using result2 = peelo::result<double, error>;
+  const result1 original = result1::ok(5);
+  const result2 copy(original);
+
+  assert(copy.type() == result2::type::ok);
+  assert(*copy.value() == *original.value());
+  assert(!copy.error());
+}
+
+static void test_copy_error_with_different_types()
+{
+  using result1 = peelo::result<int, error>;
+  using result2 = peelo::result<double, error>;
+  const result1 original = result1::error({ 404, "Not Found"});
+  const result2 copy(original);
+
+  assert(copy.type() == result2::type::error);
+  assert(copy.error()->code == original.error()->code);
+  assert(!copy.value());
+}
+
 static void test_assign_ok()
 {
   const result ok = result::ok({ 5, "Five" });
@@ -89,6 +113,36 @@ static void test_assign_error()
   assert(r.error()->code == err.error()->code);
 }
 
+static void test_assign_ok_with_different_types()
+{
+  using result1 = peelo::result<int, error>;
+  using result2 = peelo::result<double, error>;
+  const result1 ok = result1::ok(5);
+  result2 r = result2::error({ 400, "Bad Request" });
+
+  r = ok;
+
+  assert(r.type() == result2::type::ok);
+  assert(bool(r.value()));
+  assert(!r.error());
+  assert(*r.value() == *ok.value());
+}
+
+static void test_assign_error_with_different_types()
+{
+  using result1 = peelo::result<int, error>;
+  using result2 = peelo::result<double, error>;
+  const result1 err = result1::error({ 500, "Internal Server Error" });
+  result2 r = result2::ok(1);
+
+  r = err;
+
+  assert(r.type() == result2::type::error);
+  assert(!r.value());
+  assert(bool(r.error()));
+  assert(r.error()->code == err.error()->code);
+}
+
 static void test_equals()
 {
   const auto ok1 = result::ok({ 1, "One" });
@@ -108,8 +162,12 @@ int main()
   test_error();
   test_copy_ok();
   test_copy_error();
+  test_copy_ok_with_different_types();
+  test_copy_error_with_different_types();
   test_assign_ok();
   test_assign_error();
+  test_assign_ok_with_different_types();
+  test_assign_error_with_different_types();
   test_equals();
 
   return 0;

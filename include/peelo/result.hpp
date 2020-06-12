@@ -59,6 +59,12 @@ namespace peelo
       , m_value(that.m_value ? new value_type(*that.m_value) : nullptr)
       , m_error(that.m_error ? new error_type(*that.m_error) : nullptr) {}
 
+    template<class T2, class E2>
+    result(const result<T2, E2>& that)
+      : m_type(!!that ? type::ok : type::error)
+      , m_value(that.value() ? new value_type(*that.value()) : nullptr)
+      , m_error(that.error() ? new error_type(*that.error()) : nullptr) {}
+
     result& operator=(const result& that)
     {
       if (this != &that)
@@ -67,6 +73,16 @@ namespace peelo
         m_value.reset(that.m_value ? new value_type(*that.m_value) : nullptr);
         m_error.reset(that.m_error ? new error_type(*that.m_error) : nullptr);
       }
+
+      return *this;
+    }
+
+    template<class T2, class E2>
+    result& operator=(const result<T2, E2>& that)
+    {
+      m_type = !!that ? type::ok : type::error;
+      m_value.reset(that.value() ? new value_type(*that.value()) : nullptr);
+      m_error.reset(that.error() ? new error_type(*that.error()) : nullptr);
 
       return *this;
     }
