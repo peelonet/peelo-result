@@ -92,14 +92,14 @@ namespace peelo
       return m_type;
     }
 
-    inline const std::unique_ptr<value_type>& value() const
+    inline const value_type& value() const
     {
-      return m_value;
+      return *m_value;
     }
 
-    inline const std::unique_ptr<error_type>& error() const
+    inline const error_type& error() const
     {
-      return m_error;
+      return *m_error;
     }
 
     inline explicit operator bool() const

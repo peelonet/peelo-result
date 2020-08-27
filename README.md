@@ -47,12 +47,12 @@ int main()
 
   if (ok_result)
   {
-    std::cout << "OK result: " << *ok_result.value() << std::endl;
+    std::cout << "OK result: " << ok_result.value() << std::endl;
   }
 
   if (!err_result)
   {
-    std::cout << "Error code: " << err_result->code << std::endl;
+    std::cout << "Error code: " << err_result.error()->code << std::endl;
   }
 
   return 0;
