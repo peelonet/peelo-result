@@ -17,9 +17,10 @@ Header only C++11 implementation of [Rust's Result type].
 and `error`. First one creates an "OK" result, which holds some kind of value,
 while the second one creates erroneous result which holds some kind of error.
 
-Type of the error can be checked with the `type` method of `result` class. If
-the result is of type `result::type::ok`, then it's value can be accessed with
-the `value` method, otherwise it's error can be accessed with `error` method.
+Whether an result contains an value or not can be checked with `has_value`
+method of `result` class. If this method returns `true`, then it's value can be
+accessed with the `value`  method, otherwise it's error can be accessed with
+the `error` method.
 
 **Note**: The underlying containers are implemented with [std::unique_ptr], so
 accessing `value` of erroneous result leads to undefined behavior and vice
@@ -47,12 +48,12 @@ int main()
 
   if (ok_result)
   {
-    std::cout << "OK result: " << *ok_result.value() << std::endl;
+    std::cout << "OK result: " << ok_result.value() << std::endl;
   }
 
   if (!err_result)
   {
-    std::cout << "Error code: " << err_result->code << std::endl;
+    std::cout << "Error code: " << err_result.error().code << std::endl;
   }
 
   return 0;

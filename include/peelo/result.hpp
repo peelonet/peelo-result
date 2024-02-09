@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, peelo.net
+ * Copyright (c) 2020-2024, peelo.net
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,8 +24,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef PEELO_RESULT_HPP_GUARD
-#define PEELO_RESULT_HPP_GUARD
+#pragma once
 
 #include <memory>
 
@@ -38,38 +37,29 @@ namespace peelo
     using value_type = T;
     using error_type = E;
 
-    enum class type
+    static inline result<T, E> ok(const value_type& value)
     {
-      ok = 1,
-      error = 0
-    };
-
-    static inline result<T, E> ok(const T& value)
-    {
-      return result(type::ok, new value_type(value), nullptr);
+      return result(new value_type(value), nullptr);
     }
 
-    static inline result<T, E> error(const E& error)
+    static inline result<T, E> error(const error_type& error)
     {
-      return result(type::error, nullptr, new error_type(error));
+      return result(nullptr, new error_type(error));
     }
 
     result(const result& that)
-      : m_type(that.m_type)
-      , m_value(that.m_value ? new value_type(*that.m_value) : nullptr)
+      : m_value(that.m_value ? new value_type(*that.m_value) : nullptr)
       , m_error(that.m_error ? new error_type(*that.m_error) : nullptr) {}
 
-    template<class T2, class E2>
-    result(const result<T2, E2>& that)
-      : m_type(!!that ? type::ok : type::error)
-      , m_value(that.value() ? new value_type(*that.value()) : nullptr)
-      , m_error(that.error() ? new error_type(*that.error()) : nullptr) {}
+    template<class U, class G>
+    result(const result<U, G>& that)
+      : m_value(that ? new value_type(that.value()) : nullptr)
+      , m_error(that ? nullptr : new error_type(that.error())) {}
 
     result& operator=(const result& that)
     {
       if (this != &that)
       {
-        m_type = that.m_type;
         m_value.reset(that.m_value ? new value_type(*that.m_value) : nullptr);
         m_error.reset(that.m_error ? new error_type(*that.m_error) : nullptr);
       }
@@ -77,46 +67,59 @@ namespace peelo
       return *this;
     }
 
-    template<class T2, class E2>
-    result& operator=(const result<T2, E2>& that)
+    template<class U, class G>
+    result& operator=(const result<U, G>& that)
     {
-      m_type = !!that ? type::ok : type::error;
-      m_value.reset(that.value() ? new value_type(*that.value()) : nullptr);
-      m_error.reset(that.error() ? new error_type(*that.error()) : nullptr);
+      const auto has_value = that.has_value();
+
+      m_value.reset(has_value ? new value_type(that.value()) : nullptr);
+      m_error.reset(has_value ? nullptr : new error_type(that.error()));
 
       return *this;
     }
 
-    inline enum type type() const
+    inline bool has_value() const
     {
-      return m_type;
+      return !!m_value;
     }
 
-    inline const std::unique_ptr<value_type>& value() const
+    inline const value_type& value() const
     {
-      return m_value;
+      return *m_value;
     }
 
-    inline const std::unique_ptr<error_type>& error() const
+    inline const error_type& error() const
     {
-      return m_error;
+      return *m_error;
     }
 
     inline explicit operator bool() const
     {
-      return m_type == type::ok;
+      return has_value();
     }
 
     inline bool operator!() const
     {
-      return m_type == type::error;
+      return !has_value();
     }
 
     inline bool equals(const result& that) const
     {
-      return m_type == that.m_type
-        && m_value == that.m_value
-        && m_error == that.m_error;
+      if (has_value())
+      {
+        if (!that.has_value())
+        {
+          return false;
+        }
+
+        return *m_value == *that.m_value;
+      }
+      else if (that.has_value())
+      {
+        return false;
+      }
+
+      return *m_error == *that.m_error;
     }
 
     inline bool operator==(const result& that) const
@@ -129,21 +132,45 @@ namespace peelo
       return !equals(that);
     }
 
+    template<class U, class G>
+    inline bool equals(const result<U, G>& that) const
+    {
+      if (has_value())
+      {
+        if (!that.has_value())
+        {
+          return false;
+        }
+
+        return *m_value == that.value();
+      }
+      else if (that.has_value())
+      {
+        return false;
+      }
+
+      return *m_error = that.error();
+    }
+
+    template<class U, class G>
+    inline bool operator==(const result<U, G>& that) const
+    {
+      return equals(that);
+    }
+
+    template<class U, class G>
+    inline bool operator!=(const result<U, G>& that) const
+    {
+      return !equals(that);
+    }
+
   private:
-    result(
-      enum type type,
-      value_type* value,
-      error_type* error
-    )
-      : m_type(type)
-      , m_value(value)
+    result(value_type* value, error_type* error)
+      : m_value(value)
       , m_error(error) {}
 
   private:
-    enum type m_type;
     std::unique_ptr<value_type> m_value;
     std::unique_ptr<error_type> m_error;
   };
 }
-
-#endif /* !PEELO_RESULT_HPP_GUARD */
