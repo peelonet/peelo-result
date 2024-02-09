@@ -22,11 +22,8 @@ method of `result` class. If this method returns `true`, then it's value can be
 accessed with the `value`  method, otherwise it's error can be accessed with
 the `error` method.
 
-**Note**: The underlying containers are implemented with [std::unique_ptr], so
-accessing `value` of erroneous result leads to undefined behavior and vice
+Note: Accessing `value` or erronous result leads to undefined behavior and vice
 versa.
-
-[std::unique_ptr]: https://en.cppreference.com/w/cpp/memory/unique_ptr
 
 ### Usage example
 

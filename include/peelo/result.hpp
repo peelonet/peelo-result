@@ -26,12 +26,12 @@
  */
 #pragma once
 
-#include <memory>
+#include <utility>
 
 namespace peelo
 {
   template<class T, class E>
-  class result
+  class result final
   {
   public:
     using value_type = T;
@@ -51,17 +51,53 @@ namespace peelo
       : m_value(that.m_value ? new value_type(*that.m_value) : nullptr)
       , m_error(that.m_error ? new error_type(*that.m_error) : nullptr) {}
 
+    result(result&& that)
+      : m_value(std::move(that.m_value))
+      , m_error(std::move(that.m_error))
+    {
+      that.m_value = nullptr;
+      that.m_error = nullptr;
+    }
+
     template<class U, class G>
     result(const result<U, G>& that)
       : m_value(that ? new value_type(that.value()) : nullptr)
       , m_error(that ? nullptr : new error_type(that.error())) {}
 
+    ~result()
+    {
+      if (m_value)
+      {
+        delete m_value;
+      }
+      if (m_error)
+      {
+        delete m_error;
+      }
+    }
+
     result& operator=(const result& that)
     {
       if (this != &that)
       {
-        m_value.reset(that.m_value ? new value_type(*that.m_value) : nullptr);
-        m_error.reset(that.m_error ? new error_type(*that.m_error) : nullptr);
+        if (m_value)
+        {
+          delete m_value;
+          m_value = nullptr;
+        }
+        if (m_error)
+        {
+          delete m_error;
+          m_error = nullptr;
+        }
+        if (that.m_value)
+        {
+          m_value = new value_type(*that.m_value);
+        }
+        if (that.m_error)
+        {
+          m_error = new error_type(*that.m_error);
+        }
       }
 
       return *this;
@@ -70,10 +106,43 @@ namespace peelo
     template<class U, class G>
     result& operator=(const result<U, G>& that)
     {
-      const auto has_value = that.has_value();
+      if (m_value)
+      {
+        delete m_value;
+        m_value = nullptr;
+      }
+      if (m_error)
+      {
+        delete m_error;
+        m_error = nullptr;
+      }
+      if (that)
+      {
+        m_value = new value_type(that.value());
+      } else {
+        m_error = new error_type(that.error());
+      }
 
-      m_value.reset(has_value ? new value_type(that.value()) : nullptr);
-      m_error.reset(has_value ? nullptr : new error_type(that.error()));
+      return *this;
+    }
+
+    result& operator=(result&& that)
+    {
+      if (this != &that)
+      {
+        if (m_value)
+        {
+          delete m_value;
+        }
+        if (m_error)
+        {
+          delete m_error;
+        }
+        m_value = std::move(that.m_value);
+        m_error = std::move(that.m_error);
+        that.m_value = nullptr;
+        that.m_error = nullptr;
+      }
 
       return *this;
     }
@@ -105,16 +174,16 @@ namespace peelo
 
     inline bool equals(const result& that) const
     {
-      if (has_value())
+      if (m_value)
       {
-        if (!that.has_value())
+        if (!that)
         {
           return false;
         }
 
         return *m_value == *that.m_value;
       }
-      else if (that.has_value())
+      else if (that)
       {
         return false;
       }
@@ -135,16 +204,16 @@ namespace peelo
     template<class U, class G>
     inline bool equals(const result<U, G>& that) const
     {
-      if (has_value())
+      if (m_value)
       {
-        if (!that.has_value())
+        if (!that)
         {
           return false;
         }
 
         return *m_value == that.value();
       }
-      else if (that.has_value())
+      else if (that)
       {
         return false;
       }
@@ -170,7 +239,7 @@ namespace peelo
       , m_error(error) {}
 
   private:
-    std::unique_ptr<value_type> m_value;
-    std::unique_ptr<error_type> m_error;
+    value_type* m_value;
+    error_type* m_error;
   };
 }

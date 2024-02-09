@@ -14,7 +14,7 @@ FOREACH(TEST_FILENAME ${TEST_SOURCES})
   TARGET_COMPILE_FEATURES(
     ${TEST_NAME}
     PUBLIC
-      cxx_std_17
+      cxx_std_11
   )
 
   IF(MSVC)
