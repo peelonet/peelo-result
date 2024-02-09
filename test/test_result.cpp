@@ -17,103 +17,98 @@ struct error
 
 using result = peelo::result<value, error>;
 
-static void test_ok()
+static void
+test_ok()
 {
   const result r = result::ok({ 5, "five" });
 
-  assert(r.type() == result::type::ok);
   assert(bool(r) == true);
   assert(!r == false);
-  assert(bool(r.value()) == true);
-  assert(bool(r.error()) == false);
-  assert(r.value()->numeric == 5);
-  assert(r.value()->text == "five");
+  assert(r.value().numeric == 5);
+  assert(r.value().text == "five");
 }
 
-static void test_error()
+static void
+test_error()
 {
   const result r = result::error({ 404, "Not Found" });
 
-  assert(r.type() == result::type::error);
   assert(bool(r) == false);
   assert(!r == true);
-  assert(bool(r.value()) == false);
-  assert(bool(r.error()) == true);
-  assert(r.error()->code == 404);
-  assert(r.error()->message == "Not Found");
+  assert(r.error().code == 404);
+  assert(r.error().message == "Not Found");
 }
 
-static void test_copy_ok()
+static void
+test_copy_ok()
 {
   const result original = result::ok({ 5, "Five" });
   const result copy(original);
 
-  assert(copy.type() == original.type());
-  assert(copy.value()->numeric == original.value()->numeric);
-  assert(!copy.error());
+  assert(bool(copy) == bool(original));
+  assert(copy.value().numeric == original.value().numeric);
 }
 
-static void test_copy_error()
+static void
+test_copy_error()
 {
   const result original = result::error({ 404, "Not Found"});
   const result copy(original);
 
-  assert(copy.type() == original.type());
-  assert(copy.error()->code == original.error()->code);
-  assert(!copy.value());
+  assert(bool(copy) == bool(original));
+  assert(copy.error().code == original.error().code);
 }
 
-static void test_copy_ok_with_different_types()
+static void
+test_copy_ok_with_different_types()
 {
   using result1 = peelo::result<int, error>;
   using result2 = peelo::result<double, error>;
   const result1 original = result1::ok(5);
   const result2 copy(original);
 
-  assert(copy.type() == result2::type::ok);
-  assert(*copy.value() == *original.value());
-  assert(!copy.error());
+  assert(bool(copy) == bool(original));
+  assert(copy.value() == original.value());
 }
 
-static void test_copy_error_with_different_types()
+static void
+test_copy_error_with_different_types()
 {
   using result1 = peelo::result<int, error>;
   using result2 = peelo::result<double, error>;
   const result1 original = result1::error({ 404, "Not Found"});
   const result2 copy(original);
 
-  assert(copy.type() == result2::type::error);
-  assert(copy.error()->code == original.error()->code);
-  assert(!copy.value());
+  assert(!copy);
+  assert(copy.error().code == original.error().code);
 }
 
-static void test_assign_ok()
+static void
+test_assign_ok()
 {
   const result ok = result::ok({ 5, "Five" });
   result r = result::error({ 400, "Bad Request" });
 
   r = ok;
 
-  assert(r.type() == ok.type());
-  assert(bool(r.value()));
-  assert(!r.error());
-  assert(r.value()->numeric == ok.value()->numeric);
+  assert(bool(r));
+  assert(r.value().numeric == ok.value().numeric);
 }
 
-static void test_assign_error()
+static void
+test_assign_error()
 {
   const result err = result::error({ 500, "Internal Server Error" });
   result r = result::ok({ 1, "One"});
 
   r = err;
 
-  assert(r.type() == err.type());
-  assert(!r.value());
-  assert(bool(r.error()));
-  assert(r.error()->code == err.error()->code);
+  assert(!r);
+  assert(r.error().code == err.error().code);
 }
 
-static void test_assign_ok_with_different_types()
+static void
+test_assign_ok_with_different_types()
 {
   using result1 = peelo::result<int, error>;
   using result2 = peelo::result<double, error>;
@@ -122,13 +117,12 @@ static void test_assign_ok_with_different_types()
 
   r = ok;
 
-  assert(r.type() == result2::type::ok);
-  assert(bool(r.value()));
-  assert(!r.error());
-  assert(*r.value() == *ok.value());
+  assert(bool(r));
+  assert(r.value() == ok.value());
 }
 
-static void test_assign_error_with_different_types()
+static void
+test_assign_error_with_different_types()
 {
   using result1 = peelo::result<int, error>;
   using result2 = peelo::result<double, error>;
@@ -137,18 +131,18 @@ static void test_assign_error_with_different_types()
 
   r = err;
 
-  assert(r.type() == result2::type::error);
-  assert(!r.value());
-  assert(bool(r.error()));
-  assert(r.error()->code == err.error()->code);
+  assert(!r);
+  assert(r.error().code == err.error().code);
 }
 
-static void test_equals()
+static void
+test_equals()
 {
-  const auto ok1 = result::ok({ 1, "One" });
-  const auto ok2 = result::ok({ 2, "Two" });
-  const auto err1 = result::error({ 401, "Unauthorized" });
-  const auto err2 = result::error({ 418, "I'm a teapot" });
+  using my_result = peelo::result<int, std::string>;
+  const auto ok1 = my_result::ok(1);
+  const auto ok2 = my_result::ok(2);
+  const auto err1 = my_result::error("Unauthorized");
+  const auto err2 = my_result::error("I'm a teapot");
 
   assert(ok1 == ok1);
   assert(ok1 != ok2);
@@ -156,7 +150,8 @@ static void test_equals()
   assert(err1 != err2);
 }
 
-int main()
+int
+main()
 {
   test_ok();
   test_error();
@@ -169,6 +164,4 @@ int main()
   test_assign_ok_with_different_types();
   test_assign_error_with_different_types();
   test_equals();
-
-  return 0;
 }

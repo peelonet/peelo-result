@@ -1,8 +1,8 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
 
 PROJECT(
   PeeloResult
-  VERSION 0.1.0
+  VERSION 0.2.0
   DESCRIPTION "Header only C++ result type."
   HOMEPAGE_URL "https://github.com/peelonet/peelo-result"
   LANGUAGES CXX
@@ -22,7 +22,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_COMPILE_FEATURES(
   ${PROJECT_NAME}
   INTERFACE
-    cxx_std_17
+    cxx_std_11
 )
 
 INSTALL(
