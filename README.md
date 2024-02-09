@@ -1,6 +1,6 @@
 # peelo-result
 
-[![travis][travis-image]][travis-url]
+![Build](https://github.com/peelonet/peelo-result/workflows/Build/badge.svg)
 
 Header only C++11 implementation of [Rust's Result type].
 
