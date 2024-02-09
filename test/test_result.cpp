@@ -24,8 +24,8 @@ test_ok()
 
   assert(bool(r) == true);
   assert(!r == false);
-  assert(r.value().numeric == 5);
-  assert(r.value().text == "five");
+  assert(r->numeric == 5);
+  assert(r->text == "five");
 }
 
 static void
@@ -46,7 +46,7 @@ test_copy_ok()
   const result copy(original);
 
   assert(bool(copy) == bool(original));
-  assert(copy.value().numeric == original.value().numeric);
+  assert(copy->numeric == original->numeric);
 }
 
 static void
@@ -68,7 +68,7 @@ test_copy_ok_with_different_types()
   const result2 copy(original);
 
   assert(bool(copy) == bool(original));
-  assert(copy.value() == original.value());
+  assert(*copy == *original);
 }
 
 static void
@@ -92,7 +92,7 @@ test_assign_ok()
   r = ok;
 
   assert(bool(r));
-  assert(r.value().numeric == ok.value().numeric);
+  assert(r->numeric == ok->numeric);
 }
 
 static void
@@ -136,6 +136,17 @@ test_assign_error_with_different_types()
 }
 
 static void
+test_value_or()
+{
+  using my_result = peelo::result<int, std::string>;
+  const auto ok = my_result::ok(5);
+  const auto err = my_result::error("Error message");
+
+  assert(ok.value_or(10) == 5);
+  assert(err.value_or(10) == 10);
+}
+
+static void
 test_equals()
 {
   using my_result = peelo::result<int, std::string>;
@@ -163,5 +174,6 @@ main()
   test_assign_error();
   test_assign_ok_with_different_types();
   test_assign_error_with_different_types();
+  test_value_or();
   test_equals();
 }

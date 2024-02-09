@@ -30,6 +30,11 @@
 
 namespace peelo
 {
+  /**
+   * Represents result of an operation that might be successful or erroneous.
+   *
+   * The result contains either an value or error.
+   */
   template<class T, class E>
   class result final
   {
@@ -37,20 +42,32 @@ namespace peelo
     using value_type = T;
     using error_type = E;
 
+    /**
+     * Constructs an successful result with given value.
+     */
     static inline result<T, E> ok(const value_type& value)
     {
-      return result(new value_type(value), nullptr);
+      return { new value_type(value), nullptr };
     }
 
+    /**
+     * Constructs an erroneous result with given error.
+     */
     static inline result<T, E> error(const error_type& error)
     {
-      return result(nullptr, new error_type(error));
+      return { nullptr, new error_type(error) };
     }
 
+    /**
+     * Copy constructor.
+     */
     result(const result& that)
       : m_value(that.m_value ? new value_type(*that.m_value) : nullptr)
       , m_error(that.m_error ? new error_type(*that.m_error) : nullptr) {}
 
+    /**
+     * Move constructor.
+     */
     result(result&& that)
       : m_value(std::move(that.m_value))
       , m_error(std::move(that.m_error))
@@ -59,11 +76,17 @@ namespace peelo
       that.m_error = nullptr;
     }
 
+    /**
+     * Copy constructor.
+     */
     template<class U, class G>
     result(const result<U, G>& that)
       : m_value(that ? new value_type(that.value()) : nullptr)
       , m_error(that ? nullptr : new error_type(that.error())) {}
 
+    /**
+     * Destructor.
+     */
     ~result()
     {
       if (m_value)
@@ -76,6 +99,9 @@ namespace peelo
       }
     }
 
+    /**
+     * Assignment operator.
+     */
     result& operator=(const result& that)
     {
       if (this != &that)
@@ -103,6 +129,9 @@ namespace peelo
       return *this;
     }
 
+    /**
+     * Assignment operator.
+     */
     template<class U, class G>
     result& operator=(const result<U, G>& that)
     {
@@ -126,6 +155,9 @@ namespace peelo
       return *this;
     }
 
+    /**
+     * Move operator.
+     */
     result& operator=(result&& that)
     {
       if (this != &that)
@@ -147,31 +179,120 @@ namespace peelo
       return *this;
     }
 
+    /**
+     * Returns `true` if this result has an value and `false` if it has an
+     * error.
+     */
     inline bool has_value() const
     {
       return !!m_value;
     }
 
-    inline const value_type& value() const
-    {
-      return *m_value;
-    }
-
-    inline const error_type& error() const
-    {
-      return *m_error;
-    }
-
+    /**
+     * Returns `true` if this result has an value and `false` if it has an
+     * error.
+     */
     inline explicit operator bool() const
     {
       return has_value();
     }
 
+    /**
+     * Returns `false` if this result has an value and `true` if it has an
+     * error.
+     */
     inline bool operator!() const
     {
       return !has_value();
     }
 
+    /**
+     * Accesses value contained in the result. If the result contains error
+     * instead of value, expect undefined behavior.
+     */
+    inline value_type& value()
+    {
+      return *m_value;
+    }
+
+    /**
+     * Accesses value contained in the result. If the result contains error
+     * instead of value, expect undefined behavior.
+     */
+    inline const value_type& value() const
+    {
+      return *m_value;
+    }
+
+    /**
+     * Accesses value contained in the result. If the result contains error
+     * instead of value, expect undefined behavior.
+     */
+    inline value_type* operator->()
+    {
+      return m_value;
+    }
+
+    /**
+     * Accesses value contained in the result. If the result contains error
+     * instead of value, expect undefined behavior.
+     */
+    inline const value_type* operator->() const
+    {
+      return m_value;
+    }
+
+    /**
+     * References value contained in the result. If the result contains error
+     * instead of value, expect undefined behavior.
+     */
+    inline value_type& operator*()
+    {
+      return *m_value;
+    }
+
+    /**
+     * References value contained in the result. If the result contains error
+     * instead of value, expect undefined behavior.
+     */
+    inline const value_type& operator*() const
+    {
+      return *m_value;
+    }
+
+    /**
+     * Accesses error contained in the result. If the result contains value
+     * instead of error, expect undefined behavior.
+     */
+    inline error_type& error()
+    {
+      return *m_error;
+    }
+
+    /**
+     * Accesses error contained in the result. If the result contains value
+     * instead of error, expect undefined behavior.
+     */
+    inline const error_type& error() const
+    {
+      return *m_error;
+    }
+
+    /**
+     * Returns value contained in the result, or given default value if the
+     * result contains error instead of value.
+     */
+    template<class U>
+    inline value_type value_or(U&& default_value) const
+    {
+      return m_value
+        ? *m_value
+        : static_cast<value_type>(std::forward<U>(default_value));
+    }
+
+    /**
+     * Tests whether two results are equal or not.
+     */
     inline bool equals(const result& that) const
     {
       if (m_value)
@@ -191,16 +312,25 @@ namespace peelo
       return *m_error == *that.m_error;
     }
 
+    /**
+     * Equality testing operator.
+     */
     inline bool operator==(const result& that) const
     {
       return equals(that);
     }
 
+    /**
+     * Non-equality testing operator.
+     */
     inline bool operator!=(const result& that) const
     {
       return !equals(that);
     }
 
+    /**
+     * Tests whether two results are equal or not.
+     */
     template<class U, class G>
     inline bool equals(const result<U, G>& that) const
     {
@@ -221,12 +351,18 @@ namespace peelo
       return *m_error = that.error();
     }
 
+    /**
+     * Equality testing operator.
+     */
     template<class U, class G>
     inline bool operator==(const result<U, G>& that) const
     {
       return equals(that);
     }
 
+    /**
+     * Non-equality testing operator.
+     */
     template<class U, class G>
     inline bool operator!=(const result<U, G>& that) const
     {

@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
 
 PROJECT(
   PeeloResult
-  VERSION 0.4.0
+  VERSION 0.5.0
   DESCRIPTION "Header only C++ result type."
   HOMEPAGE_URL "https://github.com/peelonet/peelo-result"
   LANGUAGES CXX
