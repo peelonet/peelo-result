@@ -3,6 +3,10 @@
 
 #include <peelo/result.hpp>
 
+#if defined(_WIN32)
+#  pragma warning (disable : 4244)
+#endif
+
 #define ASSERT_TRUE(x) assert((x))
 #define ASSERT_FALSE(x) assert(!(x))
 #define ASSERT_EQ(x, y) assert((x) == (y))
