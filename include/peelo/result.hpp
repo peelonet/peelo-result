@@ -51,11 +51,29 @@ namespace peelo
     }
 
     /**
+     * Constructs an successful result from given arguments.
+     */
+    template<class... Args>
+    static inline result<T, E> ok(Args&&... args)
+    {
+      return { new value_type(args...), nullptr };
+    }
+
+    /**
      * Constructs an erroneous result with given error.
      */
     static inline result<T, E> error(const error_type& error)
     {
       return { nullptr, new error_type(error) };
+    }
+
+    /**
+     * Constructs an erroneous result from given arguments.
+     */
+    template<class... Args>
+    static inline result<T, E> error(Args&&... args)
+    {
+      return { nullptr, new error_type(args...) };
     }
 
     /**
