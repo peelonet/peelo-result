@@ -197,7 +197,10 @@ test_equals_from_different_type()
   using result1 = peelo::result<int, double>;
   using result2 = peelo::result<double, int>;
 
-  ASSERT_EQ(result1::ok(4), result2::ok(4));
+  const auto r1 = result1::ok(4);
+  const auto r2 = result2::ok(4);
+
+  ASSERT_EQ(r1, r2);
   ASSERT_EQ(result1::error(4), result2::error(4));
 
   ASSERT_NE(result1::ok(4), result2::error(4));
