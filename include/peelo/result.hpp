@@ -348,7 +348,7 @@ namespace peelo
         return false;
       }
 
-      return *m_error = that.error();
+      return *m_error == that.error();
     }
 
     /**
