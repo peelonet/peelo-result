@@ -201,7 +201,7 @@ namespace peelo
      * Returns `true` if this result has an value and `false` if it has an
      * error.
      */
-    inline bool has_value() const
+    inline constexpr bool has_value() const noexcept
     {
       return !!m_value;
     }
@@ -210,7 +210,7 @@ namespace peelo
      * Returns `true` if this result has an value and `false` if it has an
      * error.
      */
-    inline explicit operator bool() const
+    inline constexpr explicit operator bool() const noexcept
     {
       return has_value();
     }
@@ -219,7 +219,7 @@ namespace peelo
      * Returns `false` if this result has an value and `true` if it has an
      * error.
      */
-    inline bool operator!() const
+    inline constexpr bool operator!() const noexcept
     {
       return !has_value();
     }
@@ -228,7 +228,7 @@ namespace peelo
      * Accesses value contained in the result. If the result contains error
      * instead of value, expect undefined behavior.
      */
-    inline value_type& value()
+    inline constexpr value_type& value() noexcept
     {
       return *m_value;
     }
@@ -237,7 +237,7 @@ namespace peelo
      * Accesses value contained in the result. If the result contains error
      * instead of value, expect undefined behavior.
      */
-    inline const value_type& value() const
+    inline const value_type& value() const noexcept
     {
       return *m_value;
     }
@@ -246,7 +246,7 @@ namespace peelo
      * Accesses value contained in the result. If the result contains error
      * instead of value, expect undefined behavior.
      */
-    inline value_type* operator->()
+    inline constexpr value_type* operator->() noexcept
     {
       return m_value;
     }
@@ -255,7 +255,7 @@ namespace peelo
      * Accesses value contained in the result. If the result contains error
      * instead of value, expect undefined behavior.
      */
-    inline const value_type* operator->() const
+    inline constexpr const value_type* operator->() const noexcept
     {
       return m_value;
     }
@@ -264,7 +264,7 @@ namespace peelo
      * References value contained in the result. If the result contains error
      * instead of value, expect undefined behavior.
      */
-    inline value_type& operator*()
+    inline constexpr value_type& operator*() noexcept
     {
       return *m_value;
     }
@@ -273,7 +273,7 @@ namespace peelo
      * References value contained in the result. If the result contains error
      * instead of value, expect undefined behavior.
      */
-    inline const value_type& operator*() const
+    inline constexpr const value_type& operator*() const noexcept
     {
       return *m_value;
     }
@@ -282,7 +282,7 @@ namespace peelo
      * Accesses error contained in the result. If the result contains value
      * instead of error, expect undefined behavior.
      */
-    inline error_type& error()
+    inline constexpr error_type& error() noexcept
     {
       return *m_error;
     }
@@ -291,7 +291,7 @@ namespace peelo
      * Accesses error contained in the result. If the result contains value
      * instead of error, expect undefined behavior.
      */
-    inline const error_type& error() const
+    inline constexpr const error_type& error() const noexcept
     {
       return *m_error;
     }
