@@ -201,6 +201,19 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "It should be able to give fallback error to OK result",
+  "[error_or]"
+)
+{
+  const auto r1 = result::ok("hello");
+  const auto r2 = result::error({ 403, "Forbidden" });
+  const error default_error = { 404, "Not found" };
+
+  REQUIRE(r1.error_or(default_error).code == 404);
+  REQUIRE(r2.error_or(default_error).code == 403);
+}
+
+TEST_CASE(
   "It should be able to detect whether two results are equal",
   "[operator==]"
 )

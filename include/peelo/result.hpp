@@ -309,6 +309,18 @@ namespace peelo
     }
 
     /**
+     * Returns error contained in the result, or given default error if the
+     * result contains value instead of error.
+     */
+    template<class U>
+    inline error_type error_or(U&& default_error) const
+    {
+      return m_value
+        ? static_cast<error_type>(std::forward<U>(default_error))
+        : *m_error;
+    }
+
+    /**
      * Tests whether two results are equal or not.
      */
     inline bool equals(const result& that) const
