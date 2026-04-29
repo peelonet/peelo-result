@@ -32,7 +32,9 @@ versa.
 #include <string>
 #include <peelo/result.hpp>
 
-struct my_error
+using peelo::result;
+
+struct error
 {
   int code;
   std::string message;
@@ -40,8 +42,8 @@ struct my_error
 
 int main()
 {
-  auto ok_result = peelo::result<int, my_error>::ok(15);
-  auto err_result = peelo::result<int, my_error>::error({ 404, "Not Found" });
+  const auto ok_result = result<int, error>(15);
+  const auto err_result = result<int, error>::error({ 404, "Not Found" });
 
   if (ok_result)
   {

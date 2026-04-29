@@ -45,10 +45,16 @@ namespace peelo
     /**
      * Constructs an successful result with given value.
      */
-    static inline result<T, E> ok(const value_type& value)
-    {
-      return { new value_type(value), nullptr };
-    }
+    result(const value_type& value)
+      : m_value(new value_type(value))
+      , m_error(nullptr) {}
+
+    /**
+     * Constructs an successful result with given value.
+     */
+    result(value_type&& value)
+      : m_value(new value_type(std::move(value)))
+      , m_error(nullptr) {}
 
     /**
      * Constructs an successful result from given arguments.
@@ -56,7 +62,7 @@ namespace peelo
     template<class... Args>
     static inline result<T, E> ok(Args&&... args)
     {
-      return { new value_type(args...), nullptr };
+      return { new value_type(std::forward<Args>(args)...), nullptr };
     }
 
     /**
@@ -73,7 +79,7 @@ namespace peelo
     template<class... Args>
     static inline result<T, E> error(Args&&... args)
     {
-      return { nullptr, new error_type(args...) };
+      return { nullptr, new error_type(std::forward<Args>(args)...) };
     }
 
     /**

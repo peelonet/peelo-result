@@ -92,7 +92,7 @@ TEST_CASE(
   using result1 = peelo::result<int, error>;
   using result2 = peelo::result<double, error>;
 
-  const auto original = result1::ok(42);
+  const auto original = result1(42);
   const result2 copy(original);
 
   REQUIRE(bool(original) == bool(copy));
@@ -205,7 +205,7 @@ TEST_CASE(
   "[error_or]"
 )
 {
-  const auto r1 = result::ok("hello");
+  const auto r1 = result("hello");
   const auto r2 = result::error({ 403, "Forbidden" });
   const error default_error = { 404, "Not found" };
 
